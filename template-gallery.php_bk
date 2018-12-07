@@ -1,0 +1,112 @@
+<?php
+/*
+Template Name: Gallery Page
+*/
+
+get_header();
+
+?>
+
+<div id='gallery' class=' '>
+
+	<?php 
+	the_title( '<header class="entry-header"><h1 class="entry-title text-center">', '</h1></header><!-- .entry-header -->' );
+
+	?>
+
+	
+
+<?php
+
+		$args = array( 'post_type' => 'g_galleries' , 'posts_per_page' => -1 );
+		$leads = get_posts( $args );
+
+		//print_r($leads);
+		$count = 0;
+
+		foreach( $leads as $lead ){
+						
+			$thumb_id = get_post_thumbnail_id( $lead->ID );
+			$thumb_url_array = wp_get_attachment_image_src(  $thumb_id, 'thumbnail-size', true);
+			$thumb_url = $thumb_url_array[0];
+
+
+			
+				$count++;
+			?>
+
+<!--  ###################################  -->
+		  <div class='col-md-4'>
+			<a href='<?php echo $lead->guid; ?>'> <?php echo $lead->post_title;   ?> <br>
+			<img src='<?php echo $thumb_url; ?>' class='img-responsive aligncenter ' width='250'>
+			</a>
+		 
+				<p style="text-align: center;"><a class="btn btn-success btn-md" href="<?php 
+				
+					echo $lead->guid;
+			
+				
+			 ?>">Get FREE Access!</a></p><br>
+
+				<p style="text-align: center;"><a class="btn btn-default btn-md" href="<?php echo $lead->guid; ?>">Enter Access Code</a><br>
+				
+<div class='clear'></div><br>
+				
+			</div>
+<!--  ###################################  --> <!--  #Gallery col-md-4  -->
+
+
+
+		<?php
+			
+		
+			if( ($count % 3) == 0 ){  echo "<div class='clear'><hr></div><br>"; }
+
+			}
+	
+	?>
+
+<div class='clear'></div><br>
+
+<div class='clear'></div>
+
+		<header class="entry-header"><h1 class="entry-title text-center">Videos</h1></header><br><br>
+
+		<div class='col-sm-3 text-center'>
+			
+
+			<?php 
+				echo "Shaman Shawns 'Time in a Day' Theory<br>";
+				echo do_shortcode('[youtube video=TUqyjg_BXB4]'); ?>
+		</div>
+		<div class='col-sm-3 text-center'>
+			<?php 
+				echo "Shaman Shawns Pepsi SUPERBOWL 2015 Commercial<br>";
+				echo do_shortcode('[youtube video=nn4oJ_rDE-s]');
+			?>
+		</div>
+		<div class='col-sm-3 text-center'>
+			<?php 
+				echo "SHAME 2 FAME Coaching - Sample Session Explained by Shaman Shawn (#RHSoSSI)<br>";
+				echo do_shortcode('[youtube video=ZjMvqfAOVyQ]');
+			?>
+		</div>
+		<div class='col-sm-3 text-center'>
+			<?php
+				echo "Shaman Shawns Younique Makeup Tutorial<br>";
+				echo do_shortcode('[youtube video=lPxJkIlJkYM]'); 
+
+			?>
+		</div>
+
+
+<div class='clear'></div><hr>
+
+
+
+</div> <!--  #Gallery  -->
+
+
+<?php
+
+get_footer(); ?>

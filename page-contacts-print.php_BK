@@ -1,0 +1,892 @@
+<?php
+/**
+ * The template for displaying pages
+ *
+ * This is the template that displays all pages by default.
+ * Please note that this is the WordPress construct of pages and that
+ * other "pages" on your WordPress site will use a different template.
+ *
+ * @package WordPress
+ * @subpackage Twenty_Sixteen
+ * @since Twenty Sixteen 1.0
+ */
+
+get_header();
+
+if( $_POST['edit_user'] ){  
+		
+		foreach ($_POST as $param_name => $param_val) {
+	
+			update_post_meta( $_POST['ID'], $param_name, $param_val  );
+
+		}
+
+		//$vars =  get_queried_object();
+		// print_r($vars);
+		
+		echo "<h1 class='text-center'> PROFILE UPDATED!! </h1>";
+		//wp_update_user( array( 'ID' => $current_user->ID  ) );
+		
+		//wp_redirect( '/user-profile/?ID=' . $userid );
+	}
+
+
+?> 
+
+	
+<?php 
+	$user = wp_get_current_user();
+		$allowed_roles = array('editor', 'administrator');
+	if ( is_user_logged_in() && array_intersect($allowed_roles, $user->roles ) ) {		
+		
+			
+			
+		echo "<div class='container'>";
+			
+		echo "<br><br><div class='clear'></div>";
+		
+	?>
+		<div class='row'>
+			<div class='col-xs-6'>
+				<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
+			</div>	
+			
+				
+			<div class='col-xs-6'>
+			
+			<a href='/admin/contacts-print' class='btn btn-info' target='_blank'> Print </a>
+			<a href='/admin/contacts' class='btn btn-info ' target='_blank'> All Contacts >> </a>
+			
+				<button id='newpost' class='btn btn-lg btn-default pull-right'>Add New</button>
+				<button id='filter' class='btn btn-lg btn-default pull-right'>Filter</button>
+				<a href='#summary' class='btn btn-lg btn-default pull-right'>Summary</a>
+			</div><div class='clear'></div>
+			<hr>
+		</div>
+
+<div id='newpost' class='clear' style='display: none;'>
+
+<?php $lead = get_post(11975); ?>
+<div class='well contsct taskcard'>
+		<div class='col-xs-2 text-center'> Name </div>
+		<div class='col-xs-3 text-center hidden'> Email </div>
+		<div class='col-xs-2 text-center'> Phone# </div>
+		<div class='col-xs-2 text-center'> City </div>
+		<div class='col-xs-1 text-center'> State </div>
+		<div class='col-xs-2 text-center'> &nbsp; </div><br>
+		<div class='clear'></div>
+	<form method="post" action="">		
+		<div class='clear'></div>
+					<div class='col-xs-2'> 
+
+						<input type="text" name="post_title" value="John Doe">
+
+					</div>
+					<div class='col-xs-3 hidden'>
+						
+						<input type="text" name="update_lead_email" placeholder="Email" placeholder="<?php echo get_field( 'lead_email', $lead->ID ); ?>">
+
+					</div>
+					<div class='col-xs-2'>
+						
+						<input type="text" name="update_lead_phone" placeholder="<?php echo get_field( 'lead_phone', $lead->ID ); ?>">
+
+					</div>
+					<div class='col-xs-2'>
+	
+						<input type="text" name="update_lead_city" placeholder="<?php echo get_field( 'lead_city', $lead->ID ); ?>">
+
+					</div>
+					<div class='col-xs-1'>
+
+						<input type="text" name="update_lead_state" placeholder="<?php echo get_field( 'lead_state', $lead->ID ); ?>">
+
+					</div>
+					<div class='col-xs-2'>
+			<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+			<input name="new_contact" type="hidden" value="true" />
+
+
+					</div>
+					
+<div class='clear'></div>
+	
+	<br><br><div id='details' class='details' style='display: block;'>	
+				
+					<?php //echo mysql2date('n/j/y', $lead->post_date ); ?><span class=' '><?php if(  get_field( 'public_private_request', $lead->ID ) == 1 ){ echo "PRIVATE"; } ?></span>
+
+
+				<div class='col-sm-4' >
+					<b>Last Seen: </b> 
+					
+					<input type="text" name="update_last_seen" placeholder="<?php echo date('n/j/y', strtotime( get_field( 'last_seen', $lead->ID ) ) ); ?>">
+				</div>
+				<div class='col-sm-4' >
+					<b>Last Contacted: </b> 
+					
+					<input type="text" name="update_last_contacted" placeholder="Last Contacted" placeholder="<?php echo date('n/j/y', strtotime( get_field( 'last_contacted', $lead->ID ) ) ); ?>">
+				</div>
+				<div class='col-sm-4' >
+					<b>Added: </b> 
+
+					<input type="text" name="update_date_added" placeholder="Date Added" placeholder="<?php echo mysql2date('n/j/y', $lead->post_date ); ?>">
+				</div>
+				
+				<div class='clear'></div>
+				<hr>
+				
+				<div class='info'>
+				<u>Details</u><br>
+				
+				<b>Area Code: </b> <input type="text" name="update_area_code" placeholder="Area Code" placeholder="<?php echo get_field( 'area_code', $lead->ID ); ?>">
+				
+
+				<b>D.O.B: </b> <input width="100" type="text" name="update_dob" placeholder="D.O.B" placeholder="<?php echo get_field( 'lead_dob', $lead->ID ); ?>">
+				
+				</div>
+
+			<div class='clear'></div>
+				
+
+</div>
+
+<div class='clear'></div>
+<div class='well '>
+
+	<div id='addsocial<?php echo $lead->ID; ?>' style='display: block;'>
+		<div class='clear'></div><hr>
+		ADD SOCIAL FORM
+		
+		
+			<select name="site">
+					<option value="">Social</option>
+		
+		
+		<?php
+				$social = get_posts( array( 'post_type' => 'ssi_social' , 'posts_per_page' => -1, 'order' => 'asc' ) );
+				
+				foreach($social as $lead){
+					
+					?>
+					<option val="<?php echo $lead->post_name; ?>"><?php echo $lead->post_title; ?></option>
+					<?php
+					
+				}
+			?>
+					
+				<option value="other">Other</option>
+			</select>
+			
+			<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+	
+			<input type="hidden" name="add_new_social" value="true">
+			<input type="text" name="username">
+			
+		
+	</div>
+	<div class='clear'></div>
+</div>
+
+
+<br>
+	<button name="ssi_update_cf" type="submit" class='btn btn-info btn-lg pull-right' value="Update" />Add Contact</button>
+	
+	</form>						
+
+<div class='clear'></div>
+
+</div><!-- END Well Contact-->
+
+
+
+		<form id='insert_lead' method='post'>
+		<!--  <div class='col-xs-2'><input type="date" name="trans_date"></div>-->
+
+		<input type="hidden" name="cur_post_type" value="<?php echo $post->post_name; ?>">
+
+
+		
+
+		<div class='col-xs-2'><input type="text" name="client_name" placeholder="Enter Name"></div>
+		<div class='col-xs-2'><input type="text" name="client_email" placeholder="Enter Email"></div>
+		<div class='col-xs-2'><input type="text" name="client_phone" placeholder="Enter Phone" class="form-control bfh-phone" data-format="+1 (ddd) ddd-dddd"></div>
+		<div class='col-xs-2'><input type="text" name="client_city" placeholder="Enter City"></div>
+		<div class='col-xs-1'><input type="text" name="client_state" placeholder="State"></div>
+		<div class='col-xs-1'><input type="submit" value="Add"></div><br>
+		<div class='clear'></div>
+		<hr>
+
+		<div class='col-sm-2' ><input type="text" name="area_code" placeholder="Area"></div>
+		<div class='col-sm-2' ><input type="text" name="last_seen" placeholder="Last Seen"></div>
+		<div class='col-sm-2' ><input type="text" name="last_contacted" placeholder="Last Contacted"></div>
+		<div class='col-sm-3' ><input type="text" name="post_date" placeholder="Added"></div>
+		<div class='col-sm-3' ><input type="text" name="notes" placeholder="Notes"></div>
+
+
+		<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+		
+		<input type='hidden' name='insert_client' value='true'>
+		<input type='hidden' name="update" value='true'>
+		
+		<div class='clear'></div>
+	</form>
+	<br><hr>
+</div>
+
+		<div class='clear'></div>
+	
+			<br><hr>
+			
+		<?php
+		
+			/*********************************************************/
+			
+			$index = 0; 
+			$s_count = 0;
+			$social_count = array(); 
+			
+				
+			$tot_count = 0;
+
+			$total_amount = 0;
+
+	// The Query
+				
+				$args = array( 'post_type' => 'ssi_contact'  , 'posts_per_page' => -1, 'orderby'=> 'modified' );
+				$leads = get_posts( $args );
+			
+			
+		
+?>
+
+<!--  #####################   START Filter  ##############-->
+<div id='filter' class='filter' style='display: block;'>
+			
+<form id="filter">
+		<div class='col-md-2'>
+				
+		  			<input type="text" placeholder="Search... " name="searchterm">	
+					
+				
+		</div>
+		<div class='col-md-2'>
+			<select name="meeting_place">
+				<option value="">Social</option>
+		
+		
+		<?php
+				$social = get_posts( array( 'post_type' => 'ssi_social' , 'posts_per_page' => -1, 'order' => 'asc' ) );
+				
+				foreach($social as $lead){
+					
+					?>
+					<option val="<?uephp echo $lead->post_name; ?>"><?php echo $lead->post_title; ?></option>
+					<?php
+					
+				}
+			?>
+					
+				<option value="other">Other</option>
+			</select>
+		</div>
+		<div class='col-md-2'>
+			<select name="start_date">
+			<option value="">Days Ago</option>
+			<option value="1">1 day ago</option>
+			<option value="3">3 days ago</option>
+			<option value="5">5 days ago</option>
+			<option value="7">7 days ago</option>
+			<option value="30">30 days ago</option>				
+			<option value="9999">ALL TIME</option>
+			</select>
+		</div>
+		<div class='col-md-4'>
+			<select name="area_code">
+			<option value="">Filter Location</option>
+			
+			<?php
+				$locations = get_posts( array( 'post_type' => 'ssi_locations' , 'posts_per_page' => -1 ) );
+				
+				foreach($locations as $lead){
+					
+					?>
+					<option value="<?php echo get_field( 'ssi_area_code', $lead->ID); ?>"><?php echo get_field( 'ssi_area_code', $lead->ID); ?> - <?php echo get_field( 'ssi_city', $lead->ID); ?>, <?php echo get_field( 'ssi_state', $lead->ID); ?></option>
+					<?php
+					
+				}
+			?>
+			
+			</select>
+		</div>
+			<input name='filter' value='true' type="hidden">
+			<input type="submit">
+</form>
+
+			<br><br><hr>
+			
+			<?php 
+			
+			//###########  START FILTER Search Guts   ###########
+
+
+		$filter = 1;
+		
+		
+		
+		
+		if( !empty($_GET['searchterm']) ){
+				
+				
+				//echo "searchterm SET!";
+			$filtered = array();
+			foreach( $leads as $lead ){
+				
+				
+				if (preg_match("/" . $_GET['searchterm'] . "/i", $lead->post_title)) {
+					//echo "A match was found.";
+					array_push( $filtered, $lead );
+				}
+			}
+			$leads = $filtered;
+
+			$filter = 0;
+		}
+		
+		if( !empty($_GET['area_code']) ){
+				
+				
+				//echo "term SET!";
+			$filtered = array();
+			foreach( $leads as $lead ){
+				if (preg_match("/" . $_GET['area_code'] . "/i", get_field( 'area_code', $lead->ID) )) {
+					//echo "A match was found.";
+					//echo get_field( 'area_code', $lead->ID);
+					array_push( $filtered, $lead );
+				}
+			}
+			$leads = $filtered;
+		}
+		
+		if( !empty($_GET['meeting_place']) ){
+				
+				
+				//echo "meeting_place SET!";
+				
+				
+				
+			$filtered = array();
+			foreach( $leads as $lead ){
+				if( get_field( $_GET['meeting_place'], $lead->ID )  ){
+					array_push( $filtered, $lead );
+				}
+			}
+			$leads = $filtered;
+		}
+//###########   END FILTER Search Guts   ###########
+
+			//print_r( count($leads) );
+
+			//$leads = array();
+			
+			?>
+</div>
+<!--  #####################   END Filter  ##############-->
+
+<div class='col-xs-2 text-center'> Name </div>
+		<div class='col-xs-3 text-center hidden'> Email </div>
+		<div class='col-xs-2 text-center'> Phone# </div>
+		<div class='col-xs-2 text-center'> City </div>
+		<div class='col-xs-1 text-center'> State </div>
+		<div class='col-xs-1 text-center'> Area </div>
+		<div class='col-xs-2 text-center'> Social </div><br>
+		<div class='clear'></div><HR>
+
+<?php 
+			
+			
+			
+			
+			//get_template_part( 'content', 'filter' );
+			
+			
+			
+			
+			$names = array();
+			$nums = array();
+			$emails = array();
+			
+			foreach( $leads as $lead ){
+				
+				//if( get_field( 'lead_city', $lead->ID ) != "Washington" )   continue; 
+			
+					$tot_count++;
+
+					$public = 1;
+
+					
+
+					//echo "<div class='row'><div class='col-xs-6'>";
+					//echo "<div class='col-xs-6'> Name: " . $member[1] . "<br><br>";
+
+				if(  get_field( 'public_private_request', $lead->ID ) == 0  ||  is_user_logged_in()  ){ 
+					if( $lead->post_status == 'publish' ){
+
+					?>
+					
+<div class='contact-print container'>
+		
+	<form method="post" action="">		
+		<div class='clear'></div>
+				
+				
+					
+					
+						
+	
+	</form>	
+<button id='details<?php echo $lead->ID; ?>' class='btn btn-default pull-right hidden1 '>Details</button>
+
+<?php 
+
+	array_push( $names, $lead->post_title );
+	array_push( $nums, get_field( 'lead_phone', $lead->ID ));
+
+
+ ?>
+
+	
+<div class='clear'></div>
+				<?php
+
+					echo "<div id='details" . $lead->ID .  "' class='details' style='display: none;'>";
+
+				?>
+
+					<?php //echo mysql2date('n/j/y', $lead->post_date ); ?><span class=' '><?php if(  get_field( 'public_private_request', $lead->ID ) == 1 ){ echo "PRIVATE"; } ?></span>
+
+				<?php
+					
+					/*if( $lead["2.3"] ){
+					echo "<b>Location: </b> " . $lead["2.3"] . ", " . $lead["2.4"] . " " . $lead["2.5"] . "<br><br>";
+					}else	{
+					echo "<b>Location:</b> Philadelphia, PA<br>";
+					}*/
+
+				?>
+				
+				
+		<form id="update" method='post'>		
+				<div class='col-sm-4' >
+					<b>Last Seen: </b> 
+					
+					<input type="text" name="update_last_seen" value="<?php echo date('n/j/y', strtotime( get_field( 'last_seen', $lead->ID ) ) ); ?>">
+				</div>
+				<div class='col-sm-4' >
+					<b>Last Contacted: </b> 
+					
+					<input type="text" name="update_last_contacted" placeholder="Last Contacted" value="<?php echo date('n/j/y', strtotime( get_field( 'last_contacted', $lead->ID ) ) ); ?>">
+				</div>
+				<div class='col-sm-4' >
+					<b>Added: </b> 
+					
+					
+					<input type="text" name="update_date_added" placeholder="Date Added" value="<?php echo mysql2date('n/j/y', $lead->post_date ); ?>">
+				</div>
+				
+				<div class='clear'></div>
+				<hr>
+				
+				<div class='info'>
+				<u>Details</u><br>
+				
+				<b>Area Code: </b> <input type="text" name="update_area_code" placeholder="Area Code" value="<?php echo get_field( 'area_code', $lead->ID ); ?>">
+				
+				
+				
+				<b>D.O.B: </b> <input width="100" type="text" name="update_dob" placeholder="D.O.B" value="<?php echo get_field( 'lead_dob', $lead->ID ); ?>">
+				
+				</div>
+				
+			
+			<input name="ID" type="hidden" value="<?php echo $lead->ID; ?>" />
+			<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+	
+				<button name="ssi_update_cf" type="submit" class='btn btn-info' value="Update" />Update</button>
+			</form>	
+				
+				
+				
+				<?php 
+					
+					
+				// ####################   Service Log	#########
+
+				$client_profit = 0;
+
+				?>
+				<div class='clear'><br><br></div>
+				<div class='col-xs-6 col-sm-2'><b>Date</b></div>
+				<div class='col-xs-6 col-sm-2'><b>Time</b></div>
+				<div class='col-sm-2'><b>Location</b></div>
+				<div class='col-sm-2'><b>Service</b></div>
+				<div class='col-sm-2'><b>Trans ID</b></div>
+				<div class='col-sm-2'><b>Rate</b></div>
+				<div class='clear'></div>
+
+				<hr>
+
+				<?php 
+			$services = 0; 
+				// check if the repeater field has rows of data
+				if( have_rows('service_log' , $lead->ID ) ):
+
+			 	// loop through the rows of data
+				    while ( have_rows('service_log', $lead->ID ) ) : the_row();
+				$services++;
+				?>
+
+			       <div class='col-xs-6 col-sm-2'><?php echo get_sub_field('date'); ?></div>
+				<div class='col-xs-6 col-sm-2'><?php the_sub_field('time'); ?></div>
+				<div class='visible-xs'><br><br></div>
+				<div class='col-sm-2'><?php the_sub_field('location'); ?></div>
+				<div class='visible-xs'><br></div>
+				<div class='col-sm-2'><?php the_sub_field('service'); ?></div>
+				<div class='visible-xs'><br></div>
+				<div class='col-sm-2'><?php the_sub_field('trans_id'); ?></div>
+				<div class='visible-xs'><br></div>
+				<div class='col-sm-2'>$<?php the_sub_field('rate'); ?></div>
+				
+				<?php 
+					$client_profit += str_replace(['+', '-'], '', filter_var( get_sub_field('rate') , FILTER_SANITIZE_NUMBER_INT));
+					$total_amount += str_replace(['+', '-'], '', filter_var( get_sub_field('rate') , FILTER_SANITIZE_NUMBER_INT)); ?>
+				<div class='clear'></div>
+				<hr>
+				
+
+				<?php
+				    endwhile;
+
+				else :
+
+				    // no rows found
+
+				endif;
+
+?>
+
+		<button id='add_payment' class='btn btn-info btn-block'>Add Payment</button><br>
+
+	<div id='add_payment' class='' style='display: none;'>
+		<form method="post" action="" name="add_transaction">
+				<div class='col-xs-6 col-sm-2'><input  type="text" name="trans_date" placeholder="mm/dd/yy" value="<?php echo current_time( 'm/d/y' ); ?>" ></div>
+				<div class='col-xs-6 col-sm-2'><input type="text" name="trans_time" placeholder="Time" value="<?php echo current_time( 'g:i' ); ?> pm" ></div>
+				<div class='col-sm-2'><input type="text" name="trans_location" placeholder="Location" value="My Place"></div>
+				<div class='col-sm-4'><input type="text" name="trans_service" placeholder="Service" Value="Service"></div>
+				
+				<div class='col-xs-1'><input type="text" name="trans_amount" placeholder="Rate"></div>
+		<div class='col-xs-1'>
+			<input type="radio" name="income_expense" value="+">+<br>
+			<input type="radio" name="income_expense" value="-">-
+		</div>		
+				<input type="hidden" name="client_name" value="<?php echo $lead->post_title; ?>">
+				<input type="hidden" name="client_city" value="<?php echo get_field( 'lead_city', $lead->ID ); ?>">
+				<input type="hidden" name="client_phone" value="<?php echo get_field( 'lead_phone', $lead->ID ); ?>">
+				<input type="hidden" name="client_state" value="<?php echo get_field( 'lead_state', $lead->ID ); ?>">
+				
+				<input name="ID" type="hidden" value="<?php echo $lead->ID; ?>" />
+				<input name="client_id" type="hidden" value="<?php echo $lead->ID; ?>" />
+
+				<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+				<input type='hidden' name='insert_transaction' value='true'>
+				<input type='hidden' name="update" value='true'>
+				<input type="submit" class="pull-right">
+			</form>
+		</div>
+				<div class='clear'></div>
+				<hr>
+			<?php 
+				// #################### END Service Log	#########
+
+				?>
+				
+				<div class='col-xs-6 col-sm-3'>&nbsp;</div>
+				
+				<div class='col-sm-3'>&nbsp;</div>
+				
+				<div class='col-sm-3'>&nbsp;</div>
+				
+				<div class='col-sm-3'><div class='pull-right'><?php echo "Total: $" . $client_profit; ?></div></div>
+				<?php 
+					
+				
+				
+				
+					echo "<div class='clear'></div><br>";
+						
+					echo "Forms:<br>";
+			?>
+			
+			
+		
+			
+		<?php if( get_field( 'file_1', $lead->ID ) ){ ?>
+			<a target="_blank" href="<?php echo get_field( 'file_1', $lead->ID ); ?>">Client Intake (Front) </a><br>
+		<?php } ?>
+		<?php if( get_field( 'file_2', $lead->ID ) ){ ?>
+			<a target="_blank" href="<?php echo get_field( 'file_2', $lead->ID ); ?>">Client Intake (Back)</a><br>
+		<?php } ?>
+
+		
+			
+			<div class='clear'></div>
+					<div class='col-xs-6'>
+					
+						
+						
+						<img src='<?php echo get_field( 'file_1', $lead->ID ); ?>' class='img-responsive'>	
+					</div>
+					<div class='col-xs-6'>
+					
+						<img src='<?php echo get_field( 'file_2', $lead->ID ); ?>' class='img-responsive'>
+					</div>
+					<img src='<?php echo get_field( 'file_3', $lead->ID ); ?>' class='img-responsive'>
+			<?php 	
+					echo "<div class='clear'></div><br>";
+					
+					
+					echo "<div class='col-xs-12' ><b>Notes: </b> " . $lead->post_content . "</div><br>";
+
+
+					?>
+
+		<form method="post" action="" class='pull-left'>
+			<button name="update" type="submit" class='btn btn-danger' value="Remove Lead" />Delete</button>
+			<input name="ID" type="hidden" value="<?php echo $lead->ID; ?>" />
+			<input name="post_to_draft" type="hidden" value="true" />
+			<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+		</form>
+		
+	
+
+				<?php
+					echo "<a target='_blank' href='/wp-admin/post.php?post=" . $lead->ID . "&action=edit' class='btn btn-default pull-left'>Edit Lead</a>";
+				
+
+?> 
+
+</div>
+	<div class='col-xs-2'> 
+
+						<?php echo ++$count . " - "; ?>
+						<?php echo $lead->post_title; ?>
+
+					</div>
+					<div class='col-xs-3 hidden'>
+						
+						<?php echo get_field( 'lead_email', $lead->ID ); ?>
+						
+
+					</div>
+					<div class='col-xs-2'>
+						
+						<?php echo get_field( 'lead_phone', $lead->ID ); ?>
+
+					</div>
+					<div class='col-xs-2'>
+	
+						<?php echo get_field( 'lead_city', $lead->ID ); ?>
+
+					</div>
+					<div class='col-xs-1'>
+
+						<?php echo get_field( 'lead_state', $lead->ID ); ?>
+
+					</div>
+					<div class='col-xs-1'>
+
+						<?php echo get_field( 'area_code', $lead->ID ); ?>
+
+					</div>
+					<div class='col-sm-2 hidden-xs'>
+<?php 
+		$index = 0;
+		
+		
+		
+		
+		foreach( $social as $site ){ // print_r($site->post_name);				
+			?>		
+	
+			<?php 
+			//echo get_field( $lead->post_name  , $lead->ID );
+			
+			if( get_field( $site->post_name  , $lead->ID ) ){ 
+
+				$social_count[$index]++;	
+				
+				
+			?>
+				<a target='_blank' href='<?php echo get_field( 'website_link' , $site->ID ); ?><?php echo get_field( $site->post_name , $lead->ID ); ?>'><img width='20' src='
+<?php echo get_stylesheet_directory_uri(); ?>/images/icons/icon-<?php echo $site->post_name; ?>.png'  class=''>
+</a>
+
+
+			<?php 		}
+			$index++;
+			?>	
+			<?php 		
+		}
+		
+	?>
+						
+					</div>
+<div class='col-sm-2 hidden-xs'><?php echo $services . " - - Total: $" . $client_profit; ?></div>
+<div class='clear'></div><hr>
+
+
+</div><!-- END Well Contact-->
+<?php				
+				
+					
+					//print_r( $lead );
+					//echo "<hr>";
+					}// #END IF Published
+				}else{  echo "Private<hr><br>" ; } 
+
+				}
+				
+				
+?>
+<div id='summary'></div><br><br>
+
+
+
+<?php 
+
+		
+				//echo "HERE-->";
+				//print_r($social_count);
+				
+				 echo "<div class='clear'></div>";
+		$index = 0;
+		
+		
+		$social = get_posts( array( 'post_type' => 'ssi_social' , 'posts_per_page' => -1, 'order' => 'asc' ) );
+		
+		foreach( $social as $lead ){
+			
+			
+			?>		
+			
+				<div class="col-xs-1 pad0"><a target='_blank' href='<?php echo get_field( 'website_link' , $lead->ID ); ?><?php echo get_field( $lead->post_name , $lead->ID ); ?>'><img src='
+<?php echo get_stylesheet_directory_uri(); ?>/images/icons/icon-<?php echo $lead->post_name; ?>.png' width='30' class=' '><br>
+
+	<center><?php echo $social_count[$index]; ?></center>
+
+</a></div>
+			<?php 
+			
+			$index++;
+			
+			?>	
+			<?php 		
+		}
+	
+				
+				
+				//print_r( $leads );
+
+				echo "<div class='clear'></div><hr>SUMMARY<hr>";
+				
+				//echo $tot_count . "  " . $post->post_name;
+				//echo "<br><br>TOTAL---> $" .  $total_amount; 
+				//echo "<br><br>EXPENSE--> $" . $tot_expense; 
+				//echo "<br><br>PROFIT---> $" . ($tot_income - $tot_expense); 
+
+				//print_r($names);
+				//print_r($names);
+				$con_cnt = 0;
+	?>
+	<button id='numbers'>Show Numbers</button>
+	<div id='numbers' style='display:none;'>
+	<div class='col-md-3'>
+	<?php
+				foreach( $names as $name ){
+
+					if( $nums[$con_cnt] == "" ){ 
+						$con_cnt++;
+						continue;
+
+					}else{
+						//echo "<br>" . $con_cnt . "->" . $name;
+						echo "<br>" . $name;
+						$con_cnt++;
+					}
+				}
+	
+	
+	?>
+	</div>
+	<div class='col-md-3'>
+	<?php
+
+				$con_cnt = 0;
+
+				foreach( $nums as $num ){
+					if( $num == "" ){ 
+						 $con_cnt++;
+						continue;
+						echo "<br>" . $con_cnt . "->NEEDED"; 
+
+					}else{
+						//echo "<br>" . $con_cnt . "->" . $num;
+						echo "<br>" . $num;
+						$con_cnt++;
+					}
+					
+				}
+?>
+	</div>
+	
+	</div>
+	<?php
+				echo "<br><br>";
+
+
+			// Reset Query
+			wp_reset_query();
+
+
+/*********************************************************/
+
+
+
+?>
+
+</div>
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">	
+
+		<?php
+
+		// Start the loop.
+		while ( have_posts() ) : the_post();
+
+			// Include the page content template.
+			get_template_part( 'template-parts/content', 'page' );
+
+			// If comments are open or we have at least one comment, load up the comment template.
+			if ( comments_open() || get_comments_number() ) {
+				comments_template();
+			}
+
+			// End of the loop.
+		endwhile;
+		?>
+
+	</main><!-- .site-main -->
+
+</div><!-- .content-area -->
+
+	<?php } ?>
+<?php get_footer(); ?>

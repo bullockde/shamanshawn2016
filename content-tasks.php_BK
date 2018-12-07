@@ -1,0 +1,328 @@
+<div class='clear'></div>
+	<div class='clear'></div>	
+<button id='addnew' class='btn btn-block btn-lg btn-info container'>Add New</button><br>
+<div id='addnew' class='clear container' style='display: none;'>
+
+<form method="post" action="" name="add_task">
+<div class='well col-md-6 taskcard'>
+	<div class='col-md-9'>
+		<b>Task</b>
+	</div>
+	<div class='col-md-3'>
+		<b>Date</b>
+	</div>
+	<br>
+	<div class='col-md-9'>
+		<input type="text" name="trans_service" placeholder="Your task here... " >
+	</div>
+	<div class='col-md-3'>
+		<input  type="text" name="trans_date" placeholder="mm/dd/yy" value="<?php echo current_time( 'm/d/y' ); ?>" >
+	</div>
+	<div class='clear'></div><hr>
+	
+	<div class='col-xs-4' >
+				<b>Posted By: </b><br> <?php 
+				$author = wp_get_current_user();
+				//$recent_author = get_current_user( 'ID', $lead->post_author );
+				//print_r($author);
+				echo $author->display_name; ?> 
+			</div>
+			<div class='col-xs-3' >
+				<b>Assigned To: </b><br> <select name="assigned_to" style='width: 100%;'>
+					
+					<option value="all">All</option>
+					<option value="shawn">Shawn</option>
+					<option value="demetrius">Demetrius</option>
+					<option value="jalen">Jalen</option>
+					<option value="murph">Murph </option>
+					<option value="sly">Sly </option>
+					
+				</select> 
+			</div>	
+			 <div class='col-md-3'><div class='col-md-9'><input type="text" name="trans_time" placeholder=".25" ></div>Hrs</div>
+			 
+			<div class='col-md-2'>
+				<input type="text" name="trans_budget" placeholder="$$$" >
+			</div>
+		<div class='clear'></div><hr>
+		<b>Notes:</b>
+		<textarea name="notes" id="" cols="30" rows="3"></textarea>
+			<input type="submit" class="btn btn-block">
+	
+</div>	
+
+<input type="hidden" name="trans_time" placeholder="Time" value="<?php echo current_time( 'g:i' ); ?> pm" >
+				<input type="hidden" name="client_name" value="<?php echo $lead->post_title; ?>">
+				<input type="hidden" name="client_city" value="<?php echo get_field( 'lead_city', $lead->ID ); ?>">
+				<input type="hidden" name="client_phone" value="<?php echo get_field( 'lead_phone', $lead->ID ); ?>">
+				<input type="hidden" name="client_state" value="<?php echo get_field( 'lead_state', $lead->ID ); ?>">
+				
+				<input name="ID" type="hidden" value="<?php echo $lead->ID; ?>" />
+				<input name="client_id" type="hidden" value="<?php echo $lead->ID; ?>" />
+
+				<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+				<input type='hidden' name='insert_task' value='true'>
+				<input type='hidden' name="update" value='true'>
+
+
+
+</form>
+	
+</div>
+
+
+<?php	
+			
+
+
+	/*********************************************************/
+
+
+			// The Query
+
+			$leads2 = get_posts( array( 'post_type' => 'to_do', 'posts_per_page' => -1 ) );
+
+			$count = 1 ;
+			//print_r( $leads2 );
+
+
+			foreach( $leads2 as $lead ){
+					
+
+					$public = 1;
+
+					
+					
+					//echo "<hr>";
+					//echo "-->" . strcmp( $lead["24"] , "Private Request (will NOT be shown on the website)" );
+
+					//echo "<div class='row'><div class='col-md-6'>";
+					//echo "<div class='col-md-6'> Name: " . $member[1] . "<br><br>";
+
+				if(  get_field( 'public_private_request', $lead->ID ) == 0  ||  is_user_logged_in()  ){ 
+					if( $lead->post_status == 'publish' ){
+					?>
+					
+	<div class='well col-md-6 taskcard'>
+		<h1></h1>
+		<div class='col-md-8 '>
+		
+		</div>
+		<div class='col-md-4 '>
+		
+		</div>
+		<div class=' header'>
+				<div class='col-md-9'>
+					<b>Task</b>
+				</div>
+				<div class='col-md-3'>
+					<b>Date</b>
+				</div>
+				<div class='clear'></div>
+		</div>		
+				<div class='col-md-9'><?php if($lead->post_title){ echo $lead->post_title; }else{ echo 'New Request'; } ?></div>
+				<div class='col-md-3'> <?php echo mysql2date('n/j/y', $lead->post_date ); ?><span class='pull-right'><?php if(  get_field( 'public_private_request', $lead->ID ) == 1 ){ echo "PRIVATE"; } ?></span></div>
+				<div class='clear'></div><hr>
+			<?php 
+				$recent_author = get_user_by( 'ID', $lead->post_author );
+			
+			
+			?>
+				
+			<div class='col-xs-4' >
+				<b>Posted By: </b><br> <?php echo $recent_author->display_name; ?> 
+			</div>
+			<div class='col-xs-3' >
+				<b>Assigned To: </b><br> <?php echo get_field( 'assigned_to', $lead->ID ); ?> 
+			</div>	
+			 <div class='col-md-3'><a target='_blank' href='<?php echo "/apply?title=" . $lead->post_title ; ?>' class='btn btn-default btn-block'>Claim</a></div>
+			
+
+			
+			<form method="post" action="" class=' hidden'>
+				<button name="task_complete" type="submit" class='btn btn-success btn-block' value="Remove Lead" />Completed!</button>
+				
+				<input  type="hidden" name="trans_date" value="<?php echo current_time( 'm/d/y' ); ?>" >
+				<input name="ID" type="hidden" value="<?php echo $lead->ID; ?>" />
+				<input name="task_complete" type="hidden" value="true" />
+				<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+			</form>
+			
+			
+			<div class='col-md-2'>
+				<button id='details<?php echo $lead->ID; ?>' class='btn btn-default btn-block'> >>> </button>
+			</div>
+			
+			
+				<?php
+
+					echo "<br><br><div id='details" . $lead->ID .  "' class='details goal' style='display: none;' >";
+					
+					/*if( $lead["2.3"] ){
+					echo "<b>Location: </b> " . $lead["2.3"] . ", " . $lead["2.4"] . " " . $lead["2.5"] . "<br><br>";
+					}else	{
+					echo "<b>Location:</b> Philadelphia, PA<br>";
+					}*/
+					?>
+					
+					<div class='col-xs-12 text-center title' ><b>Task Goals </b> </div><div class='clear'></div>
+					<div class='col-xs-4' ><b>Date: </b> <?php echo  get_field( 'target_date', $lead->ID ) ?> </div>
+					<div class='col-xs-4' ><b>Hrs: </b> <?php echo  get_field( 'task_time', $lead->ID ) ?> </div>
+					<div class='col-xs-4' ><b>Budget: </b> $<?php echo  get_field( 'task_budget', $lead->ID ) ?> </div>
+
+					
+
+	
+
+				<?php
+					echo "<div class='clear'></div><br>";
+					echo "<div class='col-xs-12' ><b>Notes: </b> " . $lead->post_content . "</div>";
+					
+					echo "<div class='clear'></div><br>";
+					echo "<a target='_blank' href='/wp-admin/post.php?post=" . $lead->ID . "&action=edit' class='btn btn-default'>Edit Request</a>";
+
+					echo "<a target='_blank' href='/apply?title=" . $lead->post_title . "' class='btn btn-default'>Apply Now!</a>";
+
+					
+					
+								
+
+					echo "<br></div><hr>";
+					//print_r( $lead );
+					//echo "<hr>";
+					}// #END IF Published
+					
+					
+					?>
+					
+			
+		<div class='col-md-12'>
+			<form method="post" action="" class=''>
+				<button name="task_complete" type="submit" class='btn btn-success btn-block' value="Remove Lead" />Completed!</button>
+				
+				<input  type="hidden" name="trans_date" value="<?php echo current_time( 'm/d/y' ); ?>" >
+				<input name="ID" type="hidden" value="<?php echo $lead->ID; ?>" />
+				<input name="task_complete" type="hidden" value="true" />
+				<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+			</form>
+		</div>	
+				
+	</div>	
+					<?php 
+					
+					
+					
+					
+				}else{  echo "Private<hr><br>" ; } 
+					if( ($count++ % 2) == 0){ echo "<div class='clear'></div>";}
+				}
+				echo "<br><br>";
+				//print_r( $leads );
+
+
+			// Reset Query
+			wp_reset_query();
+
+
+/*********************************************************/
+?>
+	<div class='clear'></div>
+	
+	
+	
+		
+		<br><br>
+		<h3><center>All Goals</center></h3>
+		<hr>
+		<div class='col-md-2'><h2>Date</h2></div>
+		<div class='col-md-6'><h2>Title</h2></div>
+		<div class='col-md-2'><h2>Details</h2></div>
+		<div class='col-md-2'><h2>Apply</h2></div><br>
+			<hr>
+
+		<?php echo "<div id='latest'></div><br><br>"; ?>
+		
+<?php	
+
+	/*********************************************************/
+			// The Query
+
+			$leads2 = get_posts( array( 'post_type' => 'to_do', 'posts_per_page' => -1 ) );
+
+
+			//print_r( $leads2 );
+
+
+			foreach( $leads2 as $lead ){
+					
+
+					$public = 1;
+
+					
+					
+					//echo "<hr>";
+					//echo "-->" . strcmp( $lead["24"] , "Private Request (will NOT be shown on the website)" );
+
+					//echo "<div class='row'><div class='col-md-6'>";
+					//echo "<div class='col-md-6'> Name: " . $member[1] . "<br><br>";
+
+				if(  get_field( 'public_private_request', $lead->ID ) == 0  ||  is_user_logged_in()  ){ 
+					if( $lead->post_status == 'publish' ){
+					?>
+					<div class='col-md-2'> <?php echo mysql2date('n/j/y', $lead->post_date ); ?><span class='pull-right'><?php if(  get_field( 'public_private_request', $lead->ID ) == 1 ){ echo "PRIVATE"; } ?></span></div>
+					<div class='col-md-6'><?php if($lead->post_title){ echo $lead->post_title; }else{ echo 'New Request'; } ?></div>
+					<div class='col-md-2'><button id='details<?php echo $lead->ID; ?>' class='btn btn-default btn-block'>Details</button></div>
+					<div class='col-md-2'><a target='_blank' href='<?php echo "/apply?title=" . $lead->post_title ; ?>' class='btn btn-default btn-block'>Apply</a></div>
+
+					<br><br>
+					
+					<div id='details<?php echo $lead->ID; ?>' class='details' style='display: none;' >
+					
+				<?php
+
+
+					?>
+					
+					<div class='clear'></div>
+					
+					<div class='col-xs-4' ><b>Date: </b> <?php echo  get_field( 'target_date', $lead->ID ) ?> </div>
+					<div class='col-xs-4' ><b>Hrs: </b> <?php echo  get_field( 'task_time', $lead->ID ) ?> </div>
+					<div class='col-xs-4' ><b>Budget: </b> $<?php echo  get_field( 'task_budget', $lead->ID ) ?> </div>
+
+
+		
+
+				<?php
+					echo "<div class='clear'></div><br>";
+					echo "<div class='col-xs-12' ><b>Description: </b> " . $lead->post_content . "</div>";
+					
+					echo "<div class='clear'></div><br>";
+					echo "<a target='_blank' href='/wp-admin/post.php?post=" . $lead->ID . "&action=edit' class='btn btn-default'>Edit Request</a>";
+
+					echo "<a target='_blank' href='/apply?title=" . $lead->post_title . "' class='btn btn-default'>Apply Now!</a>";
+?>
+		<form method="post" action="" class='pull-right'>
+			<button name="update" type="submit" class='btn ' value="Request Complete" />Request Complete</button>
+			<input name="ID" type="hidden" value="<?php echo $lead->ID; ?>" />
+			<input name="update" type="hidden" value="true" />
+			<input name="URI" type="hidden" value="<?php echo get_page_link(); ?>" />
+		</form>
+		
+<?php 
+					echo "<br></div><hr>";
+					//print_r( $lead );
+					//echo "<hr>";
+					}// #END IF Published
+				}else{  echo "Private<hr><br>" ; } 
+					
+				}
+				echo "<br><br>";
+				//print_r( $leads );
+
+
+			// Reset Query
+			wp_reset_query();
+
+
+/*********************************************************/
+?>
